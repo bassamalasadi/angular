@@ -2,27 +2,33 @@ var express = require("express");
 var path = require("path");
 var favicon = require("serve-favicon");
 var logger = require("morgan");
-var cookieParser = require("cookie-parser");
-var bodyParser = require("body-parser");
-var mongoose = require("mongoose");
-var restful = require("node-restful");
-var methodOverride = require("method-override");
-var cors = require("cors");
-
-var index = require("./routes/index");
-var users = require("./routes/users");
-var products = require("./routes/products");
-var app = express();
+const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+const restful = require("node-restful");
+const methodOverride = require("method-override");
+const cors = require("cors");
+const config = require("./config");
+const logge = require("./logge");
+const index = require("./routes/index");
+const users = require("./routes/users");
+const products = require("./routes/products");
+const app = express();
 
 mongoose.Promise = global.Promise;
 
 mongoose
-  .connect("mongodb://localhost/product", {
+  .connect(config.MONGODB_URI, {
     useNewUrlParser: true,
-    useFindAndModify: false
+    useFindAndModify: false,
+    useCreateIndex: true
   })
-  .then(() => console.log("connection successful"))
-  .catch(err => console.error(err));
+  .then(() => {
+    logge.info("connected to MongoDB");
+  })
+  .catch(error => {
+    logge.error("error connection to MongoDB:", error.message);
+  });
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
